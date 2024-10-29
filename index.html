@@ -1,41 +1,142 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="Styles/index.css">
+    <title>Sistema de Control de Inventario - TEWU</title>
+    <style>
+        /* Estilos generales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Estilos del menú lateral */
+        .sidebar {
+            width: 250px;
+            background-color: #4b8673;
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+            height: 100vh;
+            position: fixed;
+        }
+
+        .sidebar h1 {
+            font-size: 24px;
+            color: #f4f6f9;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .menu {
+            list-style: none;
+            width: 100%;
+        }
+
+        .menu li {
+            width: 100%;
+        }
+
+        .menu li a {
+            display: block;
+            padding: 15px;
+            color: #f4f6f9;
+            text-decoration: none;
+            font-size: 18px;
+            transition: background 0.3s;
+        }
+
+        .menu li a:hover {
+            background-color: #3b6d5a;
+        }
+
+        /* Estilo del contenido principal */
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .header {
+            background-color: #4b8673;
+            padding: 10px;
+            color: #f4f6f9;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .main-content {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        /* Mejoras para botones y formularios */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4b8673;
+            color: #f4f6f9;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #3b6d5a;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            .content {
+                margin-left: 0;
+            }
+        }
+    </style>
 </head>
 <body>
-    <header class="main-header">
-        <label for="btn-nav" class="btn-nav">
-          <i class="fas fa-bars">TEWU</i>
-          
-        
-        </label>
-        <input type="checkbox" id="btn-nav">
-        
-        <nav>
-          <ul class="navigation">
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="servicios.html">Servicios</a></li>
-            <li><a href="nosotros.html">Nosotros</a></li>
-            <li><a href="contacto.html">Contacto</a></li>
-            <li><a href="iniciosesion.html">Iniciar Sesion</a></li>
-          </ul>
-        </nav>
-        
-      </header>
 
-      <main>
-        <div>
-          <p>a</p>
+    <!-- Menú lateral -->
+    <div class="sidebar">
+        <h1>TEWU</h1>
+        <ul class="menu">
+            <li><a href="#">Inicio</a></li>
+            <li><a href="#">Servicios</a></li>
+            <li><a href="#">Agregar</a></li>
+            <li><a href="#">Nosotros</a></li>
+            <li><a href="#">Contacto</a></li>
+            <li><a href="#">Iniciar Sesión</a></li>
+        </ul>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content">
+            <p>Bienvenido al sistema de control de inventario de TEWU. Aquí podrás gestionar tus productos, verificar existencias y realizar reportes de manera eficiente.</p>
+            <p>Selecciona una opción en el menú para comenzar.</p>
         </div>
-      </main>
+    </div>
 
-
-      <footer class="footer">
-        <p>1</p>
-      </footer>
 </body>
 </html>
