@@ -5,73 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eliminar Usuarios</title>
     <link rel="stylesheet" href="../Styles/index.css">
-    <style>
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        h2 {
-            text-align: center;
-            color: #4b8673;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        table, th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #4b8673;
-            color: white;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        button {
-            background-color: #c0392b;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background 0.3s;
-        }
-
-        button:hover {
-            background-color: #e74c3c;
-        }
-    </style>
+    <link rel="stylesheet" href="../Styles/bajaTable.css">
 </head>
 <body>
 
-      <!-- Menú lateral -->
-  <div class="sidebar">
-    <h1>TEWU v2</h1>
-    <ul class="menu">
-        <li><a href="../gestion.html">Inicio</a></li>
-        <li><a href="../alta.html">Agregar</a></li>
-        <li><a href="../modificar.html">Modificar</a></li>
-        <li><a href="../consultar.html">Inventario</a></li>
-        <li><a href="../Eliminar.html">Eliminar</a></li>
-        <li><a href="../index.html">Cerrar Sesión</a></li>
-    </ul>
-</div>
-
+    <script src="../scripts/menu2.js"></script>
 
 <!-- Contenido principal -->
 <div class="content">
@@ -79,7 +17,7 @@
     <div class="main-content" id="main-content">
         
         <div class="container">
-            <h2>Lista de Usuarios</h2>
+            <h2>Baja de Usuarios</h2>
             <table id="userTable">
                 <thead>
                     <tr>
@@ -100,69 +38,87 @@
     </div>
 </div>
 
+<script>
+    let rolesMap = {};
 
-    
+    // Cargar roles y crear el mapa de roles
+    async function loadRoles() {
+        try {
+            const response = await fetch('http://localhost:3000/api/rol');
+            const data = await response.json();
 
-    <script>
-        // Cargar usuarios al cargar la página
-        document.addEventListener('DOMContentLoaded', loadUsers);
-
-        // Función para cargar los usuarios y mostrarlos en la tabla
-        async function loadUsers() {
-            try {
-                const response = await fetch('http://localhost:3000/api/usuarios'); // Endpoint de consulta de usuarios
-                const data = await response.json();
-
-                if (!data.success) {
-                    throw new Error(data.error || 'Error al cargar los usuarios.');
-                }
-
-                const users = data.usuarios; // Ajusta esto según la estructura de tu respuesta
-
-                const tableBody = document.getElementById('userTable').getElementsByTagName('tbody')[0];
-                tableBody.innerHTML = ''; // Limpiar tabla
-
-                users.forEach(user => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${user.cod_usuario}</td>
-                        <td>${user.nombre_completo}</td>
-                        <td>${user.email}</td>
-                        <td>${user.id_rol}</td>
-                        <td><button onclick="deleteUser(${user.id_usuario})">Eliminar</button></td>
-                    `;
-                    tableBody.appendChild(row);
+            if (data.success) {
+                data.roles.forEach(rol => {
+                    rolesMap[rol.id_rol] = rol.nombre_rol; // Asocia el ID del rol con su nombre
                 });
-            } catch (error) {
-                console.error('Error al cargar usuarios:', error);
-                document.getElementById('mensaje').textContent = 'Error al cargar usuarios.';
+            } else {
+                console.error('Error al obtener los roles');
             }
+        } catch (error) {
+            console.error('Error al cargar los roles:', error);
+        }
+    }
+
+    // Función para cargar los usuarios y mostrarlos en la tabla
+    async function loadUsers() {
+        try {
+            const response = await fetch('http://localhost:3000/api/usuarios'); // Endpoint de consulta de usuarios
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || 'Error al cargar los usuarios.');
+            }
+
+            const users = data.usuarios;
+            const tableBody = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Limpiar tabla
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.cod_usuario}</td>
+                    <td>${user.nombre_completo}</td>
+                    <td>${user.email}</td>
+                    <td>${rolesMap[user.id_rol] || 'No asignado'}</td>
+                    <td><button onclick="deleteUser(${user.id_usuario})">Eliminar</button></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error al cargar usuarios:', error);
+            document.getElementById('mensaje').textContent = 'Error al cargar usuarios.';
+        }
+    }
+
+    async function deleteUser(id) {
+        const confirmation = confirm("¿Estás seguro de que deseas eliminar este usuario?");
+        if (!confirmation) {
+            return;
         }
 
-        async function deleteUser(id) {
-            // Confirmar antes de eliminar
-            const confirmation = confirm("¿Estás seguro de que deseas eliminar este usuario?");
-            if (!confirmation) {
-                return; // Si el usuario cancela, no hacer nada
-            }
+        try {
+            const response = await fetch(`http://localhost:3000/api/usuarios/${id}`, {
+                method: 'DELETE'
+            });
 
-            try {
-                const response = await fetch(`http://localhost:3000/api/usuarios/${id}`, {
-                    method: 'DELETE'
-                });
-
-                const result = await response.json();
-                if (result.success) {
-                    loadUsers(); // Recargar la lista de usuarios
-                } else {
-                    document.getElementById('mensaje').textContent = result.mensaje;
-                }
-            } catch (error) {
-                console.error('Error al eliminar usuario:', error);
-                document.getElementById('mensaje').textContent = 'Error al eliminar el usuario.';
+            const result = await response.json();
+            if (result.success) {
+                loadUsers(); // Recargar la lista de usuarios
+            } else {
+                document.getElementById('mensaje').textContent = result.mensaje;
             }
+        } catch (error) {
+            console.error('Error al eliminar usuario:', error);
+            document.getElementById('mensaje').textContent = 'Error al eliminar el usuario.';
         }
-    </script>
+    }
+
+    // Llamar a la función para cargar roles y usuarios cuando la página esté lista
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadRoles(); // Cargar roles primero
+        loadUsers(); // Luego cargar usuarios para que el rol se muestre correctamente
+    });
+</script>
 
 </body>
 </html>
