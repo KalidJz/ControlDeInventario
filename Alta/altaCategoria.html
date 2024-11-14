@@ -2,38 +2,23 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Alta de Productos</title>
+  <title>Alta de Categoría</title>
   <link rel="stylesheet" href="../Styles/index.css">
   <link rel="stylesheet" href="FormularioStyle.css">
 </head>
 <body>
 
   <!-- Menú lateral -->
-  <div class="sidebar">
-    <h1>TEWU v2</h1>
-    <ul class="menu">
-        <li><a href="../gestion.html">Inicio</a></li>
-        <li><a href="../alta.html">Agregar</a></li>
-        <li><a href="../modificar.html">Modificar</a></li>
-        <li><a href="../consultar.html">Inventario</a></li>
-        <li><a href="../Eliminar.html">Eliminar</a></li>
-        <li><a href="../index.html">Cerrar Sesión</a></li>
-    </ul>
-</div>
+  <script src="/scripts/menu2.js"></script>
 
 <!-- Contenido principal -->
 <div class="content">
   <div class="header">Sistema de Control de Inventario</div>
   <div class="main-content" id="main-content">
     <div class="product-form">
-      <h2>Alta de Categoria</h2>
-      <form id="formAltaProducto">
-        <input type="text" id="nombre" placeholder="Nombre del Producto" required>
-        <input type="text" id="descripcion" placeholder="Descripción" required>
-        <input type="number" id="precio" placeholder="Precio" required>
-        <input type="number" id="proveedor" placeholder="Proveedor" required>
-        <input type="number" id="cantidad" placeholder="Cantidad" required>
-        <input type="number" id="categoria" placeholder="Categoria" required>
+      <h2>Alta de Categoría</h2>
+      <form id="formAltaCategoria">
+        <input type="text" id="categoria" placeholder="Nombre de la categoría" required>
         <button type="submit">Dar de Alta</button>
       </form>
       <p id="mensaje"></p>
@@ -41,44 +26,40 @@
   </div>
 </div>
 
-
 </body>
 </html>
 
 <script>
-  document.getElementById('formAltaProducto').addEventListener('submit', async (e) => {
-      e.preventDefault();  // Evitar que el formulario se envíe de la forma tradicional
+  document.getElementById('formAltaCategoria').addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-      // Obtener los valores de los campos
-      const nombre = document.getElementById('nombre').value;
-      const descripcion = document.getElementById('descripcion').value;
-      const precio = parseFloat(document.getElementById('precio').value); // Convertir a número
-      const cantidad= document.getElementById('cantidad').value;
-      const proveedor = parseInt(document.getElementById('proveedor').value); // Convertir a número
-      const categoria = parseInt(document.getElementById('categoria').value); // Convertir a número
+      // Obtener el valor del campo de categoría
+      const nombre_categoria = document.getElementById('categoria').value;
 
       try {
-          const response = await fetch('http://localhost:3000/api/productos', {
+          const response = await fetch('http://localhost:3000/api/categorias', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json'
               },
-              body: JSON.stringify({ nombre, descripcion, precio, cantidad, proveedor, categoria })
+              body: JSON.stringify({ nombre_categoria })
           });
 
           const data = await response.json();
           const mensaje = document.getElementById('mensaje');
 
           if (response.ok) {
-              mensaje.textContent = 'Producto registrado correctamente';
+              mensaje.textContent = 'Categoría registrada correctamente';
               mensaje.style.color = 'green';
+              document.getElementById('formAltaCategoria').reset();
           } else {
-              mensaje.textContent = 'Error al registrar el producto: ' + data.error;
+              mensaje.textContent = 'Error al registrar la categoría: ' + data.error;
               mensaje.style.color = 'red';
           }
       } catch (error) {
           console.error('Error:', error);
+          mensaje.textContent = 'Error de conexión. Inténtalo de nuevo.';
+          mensaje.style.color = 'red';
       }
   });
-
 </script>

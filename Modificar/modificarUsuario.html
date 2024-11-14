@@ -5,104 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modificar Usuarios</title>
     <link rel="stylesheet" href="../Styles/index.css">
-    <style>
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        h2 {
-            text-align: center;
-            color: #4b8673;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        table, th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #4b8673;
-            color: white;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        button {
-            background-color: #2980b9;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background 0.3s;
-        }
-
-        button:hover {
-            background-color: #3498db;
-        }
-
-        .form-container {
-            display: none;
-            margin-top: 20px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #f9f9f9;
-        }
-
-        .form-container label {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .form-container input {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        .form-container button {
-            background-color: #27ae60;
-        }
-    </style>
+    <link rel="stylesheet" href="ModificarStyle.css">
 </head>
 <body>
 
-    <div class="sidebar">
-        <h1>TEWU v2</h1>
-        <ul class="menu">
-            <li><a href="../gestion.html">Inicio</a></li>
-            <li><a href="../alta.html">Agregar</a></li>
-            <li><a href="../modificar.html">Modificar</a></li>
-            <li><a href="../consultar.html">Inventario</a></li>
-            <li><a href="../Eliminar.html">Eliminar</a></li>
-            <li><a href="../index.html">Cerrar Sesión</a></li>
-        </ul>
-    </div>
+    <script src="../scripts/menu2.js"></script>
 
     <div class="content">
         <div class="header">Sistema de Control de Inventario</div>
         <div class="main-content" id="main-content">
             
             <div class="container">
-                <h2>Lista de Usuarios</h2>
+                <h2>Modificar Usuarios</h2>
                 <table id="userTable">
                     <thead>
                         <tr>
@@ -121,7 +35,7 @@
             </div>
 
             <!-- Formulario de modificación de usuario -->
-            <div class="form-container" id="updateForm">
+            <div class="form-container" id="updateForm" style="display: none;">
                 <h3>Modificar Usuario</h3>
                 <label for="nombre_completo">Nombre Completo:</label>
                 <input type="text" id="nombre_completo" name="nombre_completo" required>
@@ -133,9 +47,12 @@
                 <input type="text" id="contrasena" name="contrasena" required>
 
                 <label for="rol">Rol:</label>
-                <input type="text" id="rol" name="rol" required>
+                <select class="product-form" id="rol" required>
+                    <option value="" disabled selected>Seleccione un Rol</option>
+                </select>    
                 
                 <button onclick="confirmUpdate()">Confirmar Modificación</button>
+                <button type="button" class="button-cancel" onclick="cancelUpdate()">Cancelar</button>
             </div>
             
         </div>
@@ -143,9 +60,36 @@
 
     <script>
         let selectedUserId = null;
+        let rolesMap = {};
+
+        // Cargar roles
+        async function loadRoles() {
+            try {
+                const response = await fetch('http://localhost:3000/api/rol');
+                const data = await response.json();
+
+                if (data.success) {
+                    const rolSelect = document.getElementById('rol');
+                    data.roles.forEach(rol => {
+                        rolesMap[rol.id_rol] = rol.nombre_rol; // Mapa para asociar IDs con nombres
+                        const option = document.createElement('option');
+                        option.value = rol.id_rol; // El valor que se enviará al backend
+                        option.textContent = rol.nombre_rol; // Nombre que se mostrará en el select
+                        rolSelect.appendChild(option);
+                    });
+                } else {
+                    console.error('Error al obtener los roles');
+                }
+            } catch (error) {
+                console.error('Error al cargar los roles:', error);
+            }
+        }
 
         // Cargar usuarios al cargar la página
-        document.addEventListener('DOMContentLoaded', loadUsers);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRoles();
+            loadUsers();
+        });
 
         async function loadUsers() {
             try {
@@ -166,7 +110,7 @@
                         <td>${user.cod_usuario}</td>
                         <td>${user.nombre_completo}</td>
                         <td>${user.email}</td>
-                        <td>${user.id_rol || 'No asignado'}</td>
+                        <td>${rolesMap[user.id_rol] || 'No asignado'}</td> <!-- Mostrar el nombre del rol -->
                         <td>
                             <button onclick="showUpdateForm(${user.id_usuario}, '${user.nombre_completo}', '${user.email}', '${user.contrasena}', '${user.id_rol}')">Modificar</button>
                         </td>
@@ -190,9 +134,7 @@
 
         async function confirmUpdate() {
             const confirmation = confirm("¿Estás seguro de que deseas modificar este usuario?");
-            if (!confirmation) {
-                return;
-            }
+            if (!confirmation) return;
 
             const nombre_completo = document.getElementById('nombre_completo').value;
             const email = document.getElementById('email').value;
@@ -222,6 +164,14 @@
             }
         }
 
+        // Función para cancelar la modificación y ocultar el formulario
+        function cancelUpdate() {
+            document.getElementById('updateForm').style.display = 'none';
+            document.getElementById('nombre_completo').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('contrasena').value = '';
+            document.getElementById('rol').value = '';
+        }
     </script>
 
 </body>
